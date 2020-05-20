@@ -75,7 +75,7 @@ class Test:
         regex=re.compile(':6\d{5}')
         imgIdArr=re.findall(regex,rankByDayHtml)
         for index in range(len(imgIdArr)):
-                imgIdArr[index]=reply[index].replace(':','')
+                imgIdArr[index]=imgIdArr[index].replace(':','')
         return imgIdArr
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
@@ -92,14 +92,14 @@ class Test:
         cmd = ctx['raw_message']
 
         if cmd == '祖安':
-            reply=requests.get("https://v1.hitokoto.cn/?c=l").text
+            reply=requests.get("https://v1.hitokoto.cn/?c=i").json()
 
             # 调用api发送消息，详见cqhttp文档
             # await self.api.send_private_msg(
             #     user_id=740984027, message='收到问好')
 
             # 返回字符串：发送消息并阻止后续插件
-            return reply
+            return reply['hitokoto']
         
         if cmd == '色图':
             imgId=random.randint(600000,630000)
