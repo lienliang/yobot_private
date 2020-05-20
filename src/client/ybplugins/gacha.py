@@ -47,6 +47,35 @@ class Gacha:
                 except json.JSONDecodeError:
                     raise CodingError("卡池文件解析错误，请检查卡池文件语法")
 
+    def lucky(self) -> List[str]:
+        lucky_pools = [self._pool["pool"]["fes"],self._pool["pool"]["hidden"],
+        self._pool["pool"]["star3"],self._pool["pool"]["limited_3"]]
+        prop = 0
+        result_list = []
+        for p in lucky_pools:
+            prop += p["prop"]
+        for i in range(self._pool["settings"]["combo"] - 1):
+            resu = random.random() * prop
+            for p in lucky_pools:
+                resu -= p["prop"]
+                if resu < 0:
+                    result_list.append(p.get("prefix", "") +
+                                       random.choice(p["pool"]))
+                    break
+        prop = 0.
+        for p in lucky_pools:
+            prop += p["prop_last"]
+        resu = random.random() * prop
+        for p in lucky_pools:
+            resu -= p["prop_last"]
+            if resu < 0:
+                result_list.append(p.get("prefix", "") +
+                                   random.choice(p["pool"]))
+                break
+        if self._pool["settings"]["shuffle"]:
+            random.shuffle(result_list)
+        return result_list
+
     def result(self) -> List[str]:
         prop = 0.
         result_list = []
@@ -73,6 +102,60 @@ class Gacha:
         if self._pool["settings"]["shuffle"]:
             random.shuffle(result_list)
         return result_list
+
+    def lucky_gacha(self, qqid: int, nickname: str) -> str:
+        # self.check_ver()  # no more updating
+        db_exists = os.path.exists(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db_conn = sqlite3.connect(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db = db_conn.cursor()
+        if not db_exists:
+            db.execute(
+                '''CREATE TABLE Colle(
+                qqid INT PRIMARY KEY,
+                colle BLOB,
+                times SMALLINT,
+                last_day CHARACTER(4),
+                day_times TINYINT)''')
+        today = time.strftime("%m%d")
+        sql_info = list(db.execute(
+            "SELECT colle,times,last_day,day_times FROM Colle WHERE qqid=?", (qqid,)))
+        mem_exists = (len(sql_info) == 1)
+        if mem_exists:
+            info = pickle.loads(sql_info[0][0])
+            times, last_day, day_times = sql_info[0][1:]
+        else:
+            info = {}
+            times, last_day, day_times = 0, "", 0
+        day_limit = self._pool["settings"]["day_limit"]
+        if today != last_day:
+            last_day = today
+            day_times = 0
+        if day_limit != 0 and day_times >= day_limit:
+            return "{}今天已经抽了{}次了，明天再来吧".format(nickname, day_times)
+        result = self.lucky()
+        times += 1
+        day_times += 1
+        reply = ""
+        reply += "{}第{}抽：".format(nickname, times)
+        for char in result:
+            if char in info:
+                info[char] += 1
+                reply += "\n{}({})".format(char, info[char])
+            else:
+                info[char] = 1
+                reply += "\n{}(new)".format(char)
+        sql_info = pickle.dumps(info)
+        if mem_exists:
+            db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
+                       (sql_info, times, last_day, day_times, qqid))
+        else:
+            db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
+                       (qqid, sql_info, times, last_day, day_times))
+        db_conn.commit()
+        db_conn.close()
+        return reply
 
     def gacha(self, qqid: int, nickname: str) -> str:
         # self.check_ver()  # no more updating
@@ -140,6 +223,75 @@ class Gacha:
                 return True
         return False
 
+    def tentimes(self, qqid: int, nickname: str) -> str:
+        # self.check_ver()  # no more updating
+        db_exists = os.path.exists(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db_conn = sqlite3.connect(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db = db_conn.cursor()
+        if not db_exists:
+            db.execute(
+                '''CREATE TABLE Colle(
+                qqid INT PRIMARY KEY,
+                colle BLOB,
+                times SMALLINT,
+                last_day CHARACTER(4),
+                day_times TINYINT)''')
+        today = time.strftime("%m%d")
+        sql_info = list(db.execute(
+            "SELECT colle,times,last_day,day_times FROM Colle WHERE qqid=?", (qqid,)))
+        mem_exists = (len(sql_info) == 1)
+        if mem_exists:
+            info = pickle.loads(sql_info[0][0])
+            times, last_day, day_times = sql_info[0][1:]
+        else:
+            info = {}
+            times, last_day, day_times = 0, "", 0
+        day_limit = self._pool["settings"]["day_limit"]
+        if today != last_day:
+            last_day = today
+            day_times = 0
+        if day_limit != 0 and day_times + 10 >= day_limit:  # one time is 10 combo defined in pool.json
+            return "{}今天剩余抽卡次数不足10次，不能抽一井".format(nickname, day_times)
+        reply = ""
+        result = ""
+        flag = False
+        for i in range(1, 11):
+            if day_limit != 0 and day_times >= day_limit:
+                reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
+                break
+            single_result = self.result()
+            times += 1
+            day_times += 1
+            for char in single_result:
+                if char in info:
+                    info[char] += 1
+                    if self.check_ssr(char):
+                        result += "\n{}({})".format(char, info[char])
+                        flag = True
+                else:
+                    info[char] = 1
+                    if self.check_ssr(char):
+                        result += "\n{}(new)".format(char)
+                        flag = True
+        sql_info = pickle.dumps(info)
+        if mem_exists:
+            db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
+                       (sql_info, times, last_day, day_times, qqid))
+        else:
+            db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
+                       (qqid, sql_info, times, last_day, day_times))
+        if not result:
+            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            return reply
+        if flag:
+            reply += "{}本次下井结果：".format(nickname)
+        reply += result
+        db_conn.commit()
+        db_conn.close()
+        return reply
+
     def thirtytimes(self, qqid: int, nickname: str) -> str:
         # self.check_ver()  # no more updating
         db_exists = os.path.exists(os.path.join(
@@ -169,7 +321,7 @@ class Gacha:
         if today != last_day:
             last_day = today
             day_times = 0
-        if day_limit != 0 and day_times+30 >= day_limit:
+        if day_limit != 0 and day_times+30: >= day_limit: # one time is 10 combo defined in pool.json
             return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
         reply = ""
         result = ""
@@ -208,6 +360,9 @@ class Gacha:
         db_conn.commit()
         db_conn.close()
         return reply
+
+
+
 
     async def show_colleV2_async(self, qqid, nickname, cmd: Union[None, str] = None) -> str:
         if not os.path.exists(os.path.join(self.setting["dirname"], "collections.db")):
@@ -302,6 +457,10 @@ class Gacha:
             return 5
         elif cmd == "抽一井" or cmd == "来一井":
             return 6
+        elif cmd == "百连" or cmd == "百连抽":
+            return 7
+        elif cmd == "十连.":  # cheating code
+            return 666
         else:
             return 0
 
@@ -326,6 +485,15 @@ class Gacha:
             reply = self.thirtytimes(
                 qqid=msg["sender"]["user_id"],
                 nickname=msg["sender"]["card"])
+        elif func_num == 7:  # hundred gacha
+            reply = self.tentimes(
+                qqid = msg["sender"]["user_id"],
+                nickname = msg["sender"]["card"])
+        elif func_num == 666: # cheat gacha
+            reply = self.lucky_gacga(
+                qqid = msg["sender"]["user_id"],
+                nickname = msg["sender"]["card"]
+            )
         elif func_num == 4:
             async def show_colle():
                 df_reply = await self.show_colleV2_async(
