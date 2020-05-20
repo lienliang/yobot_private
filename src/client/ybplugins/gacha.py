@@ -490,7 +490,7 @@ class Gacha:
                 qqid = msg["sender"]["user_id"],
                 nickname = msg["sender"]["card"])
         elif func_num == 666: # cheat gacha
-            reply = self.lucky_gacga(
+            reply = self.lucky_gacha(
                 qqid = msg["sender"]["user_id"],
                 nickname = msg["sender"]["card"]
             )
