@@ -70,12 +70,12 @@ class Test:
         #     return 'yes, bot is running'
     
         #获取日榜图片ID
-    def get_id():
+    def get_id(self):
         rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
         regex=re.compile(':6\d{5}')
         imgIdArr=re.findall(regex,rankByDayHtml)
         for index in range(len(imgIdArr)):
-                imgIdArr[index]=reply[index].replace(':','')
+                imgIdArr[index]=imgIdArr[index].replace(':','')
         return imgIdArr
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
@@ -91,7 +91,7 @@ class Test:
 
         cmd = ctx['raw_message']
 
-        if cmd == '祖安':
+        if cmd.find('妈') != -1:
             reply=requests.get("https://v1.hitokoto.cn/?c=l").text
 
             # 调用api发送消息，详见cqhttp文档
@@ -107,6 +107,6 @@ class Test:
             return imgUrl
         
         if cmd == 'test':
-            print(get_id())
+            print(self.get_id)
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
