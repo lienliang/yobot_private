@@ -13,7 +13,7 @@ https://github.com/richardchien/nonebot
 如果基于此文件的PR，请在此目录下新建一个`.py`文件，并修改类名
 然后在`yobot.py`中添加`import`（这一步可以交给仓库管理者做）
 '''
-import requests
+
 import asyncio
 from typing import Any, Dict, Union
 
@@ -21,8 +21,9 @@ from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
 
+import requests
 import time
-
+import random
 class Test:
     def __init__(self,
                  glo_setting: Dict[str, Any],
@@ -89,6 +90,10 @@ class Test:
 
             # 返回字符串：发送消息并阻止后续插件
             return reply
-
+        
+        if cmd == '色图':
+            imgId=random.randint(600000,630000)
+            imgUrl="https://yande.re/post/show/"+str(imgId)
+            return imgUrl
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
