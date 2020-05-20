@@ -91,8 +91,8 @@ class Test:
 
         cmd = ctx['raw_message']
 
-        if cmd.find('妈') != -1:
-            reply=requests.get("https://v1.hitokoto.cn/?c=l").text
+#        if cmd.find('妈') != -1:
+#            reply=requests.get("https://v1.hitokoto.cn/?c=l").text
 
             # 调用api发送消息，详见cqhttp文档
             # await self.api.send_private_msg(
