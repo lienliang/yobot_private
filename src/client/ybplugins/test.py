@@ -54,7 +54,7 @@ class Test:
 
 
         # # 注册定时任务，详见apscheduler文档
-        @scheduler.scheduled_job('interval', minutes=2)
+        @scheduler.scheduled_job('interval', minutes=60)
         async def good_morning():
             now = time.time()
             local_time = time.localtime(now)
@@ -79,7 +79,7 @@ class Test:
         # return
 
         cmd = ctx['raw_message']
-        
+
         if cmd == '祖安':
             reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
 
