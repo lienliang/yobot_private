@@ -21,6 +21,7 @@ from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
 
+import time
 
 class Test:
     def __init__(self,
@@ -43,7 +44,7 @@ class Test:
         # 此时没有running_loop，不要直接使用await，请使用asyncio.ensure_future并指定loop=asyncio.get_event_loop()
 
         # 如果需要启用，请注释掉下面一行
-        return
+        #return
 
         # 这是来自yobot_config.json的设置，如果需要增加设置项，请修改default_config.json文件
         self.setting = glo_setting
@@ -51,10 +52,13 @@ class Test:
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
 
+        now = time.time()
+        local_time = time.localtime(now)
+        date_format_localtime = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
         # # 注册定时任务，详见apscheduler文档
         @scheduler.scheduled_job('interval', minutes=2)
         async def good_morning():
-            await self.api.send_group_msg(group_id=690925851, message='这是妈在测试')
+            await self.api.send_group_msg(group_id=690925851, message={"这是妈在测试,时间戳为："+date_format_localtime})
 
         # # 注册web路由，详见flask与quart文档
         # @app.route('/is-bot-running', methods=['GET'])
