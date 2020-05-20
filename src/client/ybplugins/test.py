@@ -24,6 +24,7 @@ from quart import Quart
 import requests
 import time
 import random
+import re
 class Test:
     def __init__(self,
                  glo_setting: Dict[str, Any],
@@ -67,6 +68,15 @@ class Test:
         # @app.route('/is-bot-running', methods=['GET'])
         # async def check_bot():
         #     return 'yes, bot is running'
+    
+        #获取日榜图片ID
+    def get_id():
+        rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
+        regex=re.compile(':6\d{5}')
+        imgIdArr=re.findall(regex,rankByDayHtml)
+        for index in range(len(imgIdArr)):
+                imgIdArr[index]=reply[index].replace(':','')
+        return imgIdArr
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
@@ -82,7 +92,7 @@ class Test:
         cmd = ctx['raw_message']
 
         if cmd == '祖安':
-            reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
+            reply=requests.get("https://v1.hitokoto.cn/?c=l").text
 
             # 调用api发送消息，详见cqhttp文档
             # await self.api.send_private_msg(
@@ -95,5 +105,8 @@ class Test:
             imgId=random.randint(600000,630000)
             imgUrl="https://yande.re/post/show/"+str(imgId)
             return imgUrl
+        
+        if cmd == 'test':
+            print(get_id())
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
