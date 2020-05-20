@@ -49,6 +49,8 @@ bot = Yobot(data_path="./yobot_data",
             )
 
 
+
+
 @cqbot.on_message
 async def handle_msg(context):
     if context["message_type"] == "group" or context["message_type"] == "private":

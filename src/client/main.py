@@ -5,6 +5,9 @@
 import platform
 import os
 import sys
+import pytz
+import schedule
+
 
 if platform.system() == "Linux":
     if "-g" not in sys.argv[1:]:
@@ -34,10 +37,10 @@ import time
 
 import pytz
 from aiocqhttp import CQHttp
+from aiocqhttp.exceptions import Error as CQHttpError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import yobot
-
 
 def main():
     print("""==============================
@@ -116,6 +119,7 @@ def main():
                          misfire_grace_time=60)
         sche.start()
 
+    schedule.every(2).minutes.do(job)
     print("初始化完成，启动服务...")
 
     cqbot.run(
@@ -133,3 +137,14 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nCtrl-C")
         sys.exit(0)
+
+
+def job():
+    #now = datetime.now(pytz.timezone('Asia/Shanghai'))
+    try:
+        await aiocqhttp.api.send_group_msg(
+                                group_id=690925851,
+                                message='测试',
+                            )
+    except CQHttpError:
+        pass
