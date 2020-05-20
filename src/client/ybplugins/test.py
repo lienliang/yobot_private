@@ -13,7 +13,7 @@ https://github.com/richardchien/nonebot
 如果基于此文件的PR，请在此目录下新建一个`.py`文件，并修改类名
 然后在`yobot.py`中添加`import`（这一步可以交给仓库管理者做）
 '''
-
+import requests
 import asyncio
 from typing import Any, Dict, Union
 
@@ -76,17 +76,19 @@ class Test:
         # 注意：这是一个异步函数，禁止使用阻塞操作（比如requests）
 
         # 如果需要使用，请注释掉下面一行
-        return
+        # return
 
         cmd = ctx['raw_message']
-        if cmd == '你好':
+        
+        if cmd == '祖安':
+            reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
 
             # 调用api发送消息，详见cqhttp文档
-            await self.api.send_private_msg(
-                user_id=123456, message='收到问好')
+            # await self.api.send_private_msg(
+            #     user_id=740984027, message='收到问好')
 
             # 返回字符串：发送消息并阻止后续插件
-            return '世界'
+            return reply
 
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
