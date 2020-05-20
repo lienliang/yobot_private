@@ -25,7 +25,9 @@ import requests
 import time
 import random
 import re
+
 class Test:
+    id_arr:[]
     def __init__(self,
                  glo_setting: Dict[str, Any],
                  scheduler: AsyncIOScheduler,
@@ -54,29 +56,37 @@ class Test:
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
 
+        
 
+        def get_id(self):
+            print('获取日榜ID中')
+            rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
+            regex=re.compile('"id":\d{6}')
+            imgIdArr=re.findall(regex,rankByDayHtml)
+            for index in range(len(imgIdArr)):
+                imgIdArr[index]=imgIdArr[index].replace('"id":','')
+            print('获取日榜ID成功')
+            return imgIdArr
+        # self.id_arr=get_id(self)   
         # # 注册定时任务，详见apscheduler文档
         @scheduler.scheduled_job('interval', minutes=60)
+        # async def get_id_schedule():
+        #     self.id_arr=get_id(self)
         async def good_morning():
             now = time.time()
             local_time = time.localtime(now)
             date_format_localtime = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
             test_msg = "这是妈在测试,时间戳为："+date_format_localtime
             await self.api.send_group_msg(group_id=690925851, message=test_msg)
+        
 
         # # 注册web路由，详见flask与quart文档
         # @app.route('/is-bot-running', methods=['GET'])
         # async def check_bot():
         #     return 'yes, bot is running'
-    
+
         #获取日榜图片ID
-    def get_id():
-        rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
-        regex=re.compile(':6\d{5}')
-        imgIdArr=re.findall(regex,rankByDayHtml)
-        for index in range(len(imgIdArr)):
-                imgIdArr[index]=imgIdArr[index].replace(':','')
-        return imgIdArr
+    
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
@@ -91,7 +101,11 @@ class Test:
 
         cmd = ctx['raw_message']
 
-        if cmd == '祖安':
+        if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
+            reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
+            return reply
+
+        if cmd.find('妈') != -1 and cmd.find('你妈死了') == -1:
             reply=requests.get("https://v1.hitokoto.cn/?c=i").json()
 
             # 调用api发送消息，详见cqhttp文档
@@ -101,12 +115,23 @@ class Test:
             # 返回字符串：发送消息并阻止后续插件
             return reply['hitokoto']
         
-        if cmd == '色图':
-            imgId=random.randint(600000,630000)
-            imgUrl="https://yande.re/post/show/"+str(imgId)
-            return imgUrl
+        if cmd.find('色图') != -1 :
+            index=random.randint(0,len(self.id_arr))
+
+            imgUrl="https://yande.re/post/show/"+self.id_arr[index]
+            return 'yande日榜 '+imgUrl
         
-        if cmd == 'test':
-            print(get_id())
+        if cmd.find('1453766088') != -1 and cmd.find('CQ:at') != -1:
+            
+            msg = re.sub(r'^\[[a-zA-Z,:=\w]*\]','',cmd)
+            apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
+            try:
+                reply =requests.get(apiUrl).json()
+            except json.JSONDecodeError as e:
+                print(e)
+                reply = msg
+            return reply['content']
+          
+        
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
