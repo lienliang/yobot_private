@@ -52,13 +52,15 @@ class Test:
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
 
-        now = time.time()
-        local_time = time.localtime(now)
-        date_format_localtime = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
+
         # # 注册定时任务，详见apscheduler文档
         @scheduler.scheduled_job('interval', minutes=2)
         async def good_morning():
-            await self.api.send_group_msg(group_id=690925851, message={"这是妈在测试,时间戳为："+date_format_localtime})
+            now = time.time()
+            local_time = time.localtime(now)
+            date_format_localtime = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
+            test_msg = "这是妈在测试,时间戳为："+date_format_localtime
+            await self.api.send_group_msg(group_id=690925851, message=test_msg)
 
         # # 注册web路由，详见flask与quart文档
         # @app.route('/is-bot-running', methods=['GET'])
