@@ -119,7 +119,6 @@ def main():
                          misfire_grace_time=60)
         sche.start()
 
-    schedule.every(2).minutes.do(job)
     print("初始化完成，启动服务...")
 
     cqbot.run(
@@ -138,13 +137,3 @@ if __name__ == "__main__":
         print("\nCtrl-C")
         sys.exit(0)
 
-
-def job():
-    #now = datetime.now(pytz.timezone('Asia/Shanghai'))
-    try:
-        await aiocqhttp.api.send_group_msg(
-                                group_id=690925851,
-                                message='测试',
-                            )
-    except CQHttpError:
-        pass

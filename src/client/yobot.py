@@ -25,7 +25,7 @@ else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom)
+                           yobot_msg, custom, test)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -221,6 +221,7 @@ class Yobot:
         # load new plugins
         self.plug_new = [
             custom.Custom(**kwargs),
+            test.Test(**kwargs),
         ]
 
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
