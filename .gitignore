@@ -21,3 +21,4 @@ src/client/test.py
 cqhttp
 .idea/
 .DS_Store
+local_test/
