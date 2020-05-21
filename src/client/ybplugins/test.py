@@ -26,6 +26,8 @@ import time
 import random
 import re
 
+import ab
+
 class Test:
     id_arr:[]
     def __init__(self,
@@ -103,6 +105,7 @@ class Test:
 
         if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
             reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
+            reply=ab.str2abs(reply)
             return reply
 
         if cmd.find('妈') != -1 and cmd.find('你妈死了') == -1:
@@ -116,21 +119,27 @@ class Test:
             return reply['hitokoto']
         
         if cmd.find('色图') != -1 :
-            index=random.randint(0,len(self.id_arr))
-
-            imgUrl="https://yande.re/post/show/"+self.id_arr[index]
-            return 'yande日榜 '+imgUrl
+            print('获取色图')
+            try:
+                res=requests.get('https://api.ixiaowai.cn/api/api.php?return=json').text
+                res=res.split(',')[1].split(':')
+                reply=(res[1]+':'+res[2]).replace('\\','')
+            except json.JSONDecodeError as e:
+                print(e)
+                reply = '获取图片失败'
+            return reply
         
         if cmd.find('1453766088') != -1 and cmd.find('CQ:at') != -1:
             
             msg = re.sub(r'^\[[a-zA-Z,:=\w]*\]','',cmd)
             apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
             try:
-                reply =requests.get(apiUrl).json()
+                reply =requests.get(apiUrl).json()['content']
+                reply=ab.str2abs(reply)
             except json.JSONDecodeError as e:
                 print(e)
                 reply = msg
-            return reply['content']
+            return reply
           
         
         # 返回布尔值：是否阻止后续插件（返回None视作False）
