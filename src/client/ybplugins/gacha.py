@@ -216,7 +216,7 @@ class Gacha:
         prop = 0.
         for p in self._pool["pool"].values():
             prop += p["prop"]
-        prop = prop*0.05
+        prop = prop*0.025 # threshold test
         for p in self._pool["pool"].values():
             chars = [p.get("prefix", "")+x for x in p["pool"]]
             if char in chars and p["prop"] < prop:
