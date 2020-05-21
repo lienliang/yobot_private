@@ -116,10 +116,15 @@ class Test:
             return reply['hitokoto']
         
         if cmd.find('色图') != -1 :
-            index=random.randint(0,len(self.id_arr))
-
-            imgUrl="https://yande.re/post/show/"+self.id_arr[index]
-            return 'yande日榜 '+imgUrl
+            print('获取色图')
+            try:
+                res=requests.get('https://api.ixiaowai.cn/api/api.php?return=json').text
+                res=res.split(',')[1].split(':')
+                reply=(res[1]+':'+res[2]).replace('\\','')
+            except json.JSONDecodeError as e:
+                print(e)
+                reply = '获取图片失败'
+            return reply
         
         if cmd.find('1453766088') != -1 and cmd.find('CQ:at') != -1:
             
