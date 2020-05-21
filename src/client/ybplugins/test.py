@@ -134,11 +134,12 @@ class Test:
             msg = re.sub(r'^\[[a-zA-Z,:=\w]*\]','',cmd)
             apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
             try:
-                reply =requests.get(apiUrl).json()
+                reply =requests.get(apiUrl).json()['content']
+                reply=ab.str2abs(reply)
             except json.JSONDecodeError as e:
                 print(e)
                 reply = msg
-            return reply['content']
+            return reply
           
         
         # 返回布尔值：是否阻止后续插件（返回None视作False）
