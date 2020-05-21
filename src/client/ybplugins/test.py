@@ -70,13 +70,13 @@ class Test:
         #     return 'yes, bot is running'
     
         #获取日榜图片ID
-    def get_id(self):
-        rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
-        regex=re.compile(':6\d{5}')
-        imgIdArr=re.findall(regex,rankByDayHtml)
-        for index in range(len(imgIdArr)):
-                imgIdArr[index]=imgIdArr[index].replace(':','')
-        return imgIdArr
+#    def get_id(self):
+#        rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
+#        regex=re.compile(':6\d{5}')
+#        imgIdArr=re.findall(regex,rankByDayHtml)
+#        for index in range(len(imgIdArr)):
+#                imgIdArr[index]=imgIdArr[index].replace(':','')
+#        return imgIdArr
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
