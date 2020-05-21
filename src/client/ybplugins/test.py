@@ -27,9 +27,44 @@ import random
 import re
 
 import ab
+import json
+
+url = "http://openapi.tuling123.com/openapi/api/v2"
+
+payload = {
+	"reqType":0,
+    "perception": {
+        "inputText": {
+            "text": "你生1日"
+        }
+    },
+    "userInfo": {
+        "apiKey": "f25069c9279945388b191de71715f344",
+        "userId": "487406"
+    }
+}
+headers = {
+  'Content-Type': 'application/json'
+}
+
 
 class Test:
     id_arr:[]
+    postData = {
+	"reqType":0,
+    "perception": {
+        "inputText": {
+            "text": "你生1日"
+            }
+        },
+        "userInfo": {
+        "apiKey": "f25069c9279945388b191de71715f344",
+        "userId": "487406"
+        }
+    }
+    headers = {
+        'Content-Type': 'text/plain'
+    }
     def __init__(self,
                  glo_setting: Dict[str, Any],
                  scheduler: AsyncIOScheduler,
@@ -103,10 +138,10 @@ class Test:
 
         cmd = ctx['raw_message']
 
-        if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
-            reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
-            reply=ab.str2abs(reply)
-            return reply
+        # if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
+        #     reply=requests.get("https://nmsl.shadiao.app/api.php?level=min").text
+        #     reply=ab.str2abs(reply)
+        #     return reply
 
         if cmd.find('妈') != -1 and cmd.find('你妈死了') == -1:
             reply=requests.get("https://v1.hitokoto.cn/?c=i").json()
@@ -132,13 +167,8 @@ class Test:
         if cmd.find('1453766088') != -1 and cmd.find('CQ:at') != -1:
             
             msg = re.sub(r'^\[[a-zA-Z,:=\w]*\]','',cmd)
-            apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
-            try:
-                reply =requests.get(apiUrl).json()['content']
-                reply=ab.str2abs(reply)
-            except json.JSONDecodeError as e:
-                print(e)
-                reply = msg
+            # apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
+            reply = requests.post(url,json=payload,headers=headers).json()['results'][0]['values']['text']
             return reply
           
         
