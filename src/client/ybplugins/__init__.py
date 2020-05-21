@@ -15,5 +15,5 @@ __all__ = [
     'updater',
     'push_news',
     'calender',
-    'custom',
+    'custom'
 ]

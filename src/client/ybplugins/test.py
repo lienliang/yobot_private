@@ -26,6 +26,8 @@ import time
 import random
 import re
 
+import ab
+
 class Test:
     id_arr:[]
     def __init__(self,
@@ -103,6 +105,7 @@ class Test:
 
         if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
             reply=requests.get("https://nmsl.shadiao.app/api.php?level=max").text
+            reply=ab.str2abs(reply)
             return reply
 
         if cmd.find('妈') != -1 and cmd.find('你妈死了') == -1:
