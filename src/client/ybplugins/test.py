@@ -99,7 +99,7 @@ class Test:
             #     user_id=740984027, message='收到问好')
 
             # 返回字符串：发送消息并阻止后续插件
-            return reply
+#            return reply
         
         if cmd == '色图':
             imgId=random.randint(600000,630000)
