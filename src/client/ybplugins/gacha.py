@@ -219,7 +219,7 @@ class Gacha:
         prop = prop*0.025 # threshold test
         for p in self._pool["pool"].values():
             chars = [p.get("prefix", "")+x for x in p["pool"]]
-            if char in chars and p["prop"] < prop:
+            if char in chars and p["prop"] < prop and p["prop"] != 4:  # last condition is necessary to exclude 1 star
                 return True
         return False
 
