@@ -283,10 +283,10 @@ class Gacha:
             db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
                        (qqid, sql_info, times, last_day, day_times))
         if not result:
-            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            reply = "{}太非了，本次百连没有抽到ssr。".format(nickname)
             return reply
         if flag:
-            reply += "{}本次下井结果：".format(nickname)
+            reply += "{}本次百连结果：".format(nickname)
         reply += result
         db_conn.commit()
         db_conn.close()
