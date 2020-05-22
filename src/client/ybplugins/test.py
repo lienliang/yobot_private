@@ -104,25 +104,52 @@ class Test:
                 imgIdArr[index]=imgIdArr[index].replace('"id":','')
             print('获取日榜ID成功')
             return imgIdArr
-        # self.id_arr=get_id(self)   
-        # # 注册定时任务，详见apscheduler文档
-        @scheduler.scheduled_job('interval', minutes=60)
-        # async def get_id_schedule():
-        #     self.id_arr=get_id(self)
+
+        # 保留此接口作为每日早安任务
+        @scheduler.scheduled_job('cron', hour='8', minute='30')
         async def good_morning():
+            now = time.time() # 获取时间戳
+            local_time = time.localtime(now)  # 转时区
+
+            month = int(time.strftime('%m', local_time))    # 获得富格式时间
+            date = int(time.strftime('%d', local_time))
+
+            # 查询节假日API，决定动作模式
+            date_format_localtime = time.strftime('%Y%m%d', local_time)
+            url = "http://tool.bitefu.net/jiari/?d=" + date_format_localtime + "&info=1"
+            response = requests.request("GET", url).json()
+
+            type = response["type"]  # Extract信息
+            weekcn = response["weekcn"]
+
+            if type == 0:
+                new_msg = "主人早安，今天是" + str(month) + "月" + str(date) + "号周" + str(weekcn) + "呢，请打起精神来准备上班啦~"
+            elif type == 1:
+                new_msg = "主人起得真早，今天是" + str(month) + "月" + str(date) + "号周" + str(weekcn) + "哦，周末再多睡一点也没关系的呢"
+            else:
+                new_msg = "今天是" + str(month) + "月" + str(date) + "号周" + str(weekcn) + "呀！ 快起床搬砖！ 嘻嘻，骗你的呀，今天调休呢"
+
+            await self.api.send_group_msg(group_id=690925851, message=new_msg)
+
+
+        # 保留此接口作为每日晚安任务
+        @scheduler.scheduled_job('cron', hour='11', minute='30')
+        async def good_night():
             now = time.time()
             local_time = time.localtime(now)
-            date_format_localtime = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
-            test_msg = "这是妈在测试,时间戳为："+date_format_localtime
-            await self.api.send_group_msg(group_id=690925851, message=test_msg)
-        
+            # 查询节假日API，决定动作模式
+            date_format_localtime = time.strftime('%Y%m%d', local_time)
+            url = "http://tool.bitefu.net/jiari/?d=" + date_format_localtime + "&info=1"
+            response = requests.request("GET", url).json()
+            week = response["week2"] # extract 信息
 
-        # # 注册web路由，详见flask与quart文档
-        # @app.route('/is-bot-running', methods=['GET'])
-        # async def check_bot():
-        #     return 'yes, bot is running'
+            if week == "5" or week == "6":
+                new_msg = "今天是周末？ 好吧那... 是可以晚一点，但是不要太晚哦！"
+            else:
+                new_msg = "时间不早了，主人请早点休息，这样才能精神饱满地迎接新的一天呢~"
+            await self.api.send_group_msg(group_id=690925851, message=new_msg)
 
-        #获取日榜图片ID
+
     
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
