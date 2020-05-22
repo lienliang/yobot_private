@@ -29,13 +29,14 @@ import re
 import ab
 import json
 
+# 图灵机器人API
 url = "http://openapi.tuling123.com/openapi/api/v2"
-
+# 图灵机器人POST数据
 payload = {
 	"reqType":0,
     "perception": {
         "inputText": {
-            "text": "你生1日"
+            "text": "可可萝"
         }
     },
     "userInfo": {
@@ -43,28 +44,19 @@ payload = {
         "userId": "487406"
     }
 }
+# POST访问头
 headers = {
   'Content-Type': 'application/json'
 }
-
-
+# 图灵机器人APIKEY
+apiKey = [
+    "db35ba9e08ad4acfa1942d80fc87eac0","f25069c9279945388b191de71715f344",
+    "67ade1de28fa440f9248851caebbdb68",
+    "4d9af4e01f754827a03fd1d946766aa3",
+    "b13414ff212840759e08455398326e41",
+]
 class Test:
-    id_arr:[]
-    postData = {
-	"reqType":0,
-    "perception": {
-        "inputText": {
-            "text": "你生1日"
-            }
-        },
-        "userInfo": {
-        "apiKey": "f25069c9279945388b191de71715f344",
-        "userId": "487406"
-        }
-    }
-    headers = {
-        'Content-Type': 'text/plain'
-    }
+    Himg:[]
     def __init__(self,
                  glo_setting: Dict[str, Any],
                  scheduler: AsyncIOScheduler,
@@ -83,7 +75,9 @@ class Test:
         # 注意：这个类加载时，asyncio事件循环尚未启动，且bot_api没有连接
         # 此时不要调用bot_api
         # 此时没有running_loop，不要直接使用await，请使用asyncio.ensure_future并指定loop=asyncio.get_event_loop()
-
+        # 调用api发送消息，详见cqhttp文档
+        # await self.api.send_private_msg(
+        # user_id=740984027, message='收到问好')
         # 如果需要启用，请注释掉下面一行
         #return
 
@@ -93,17 +87,16 @@ class Test:
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
 
-        
-
-        def get_id(self):
-            print('获取日榜ID中')
+        def getRecentYandeImgUrl(self):
+            print('获取日榜图片URL中')
             rankByDayHtml=requests.get('https://yande.re/post/popular_recent').text
-            regex=re.compile('"id":\d{6}')
-            imgIdArr=re.findall(regex,rankByDayHtml)
-            for index in range(len(imgIdArr)):
-                imgIdArr[index]=imgIdArr[index].replace('"id":','')
-            print('获取日榜ID成功')
-            return imgIdArr
+            regex=re.compile('"sample_url":.*\.jpg","s')
+            imgUrl=re.findall(regex,rankByDayHtml)
+            for index in range(len(imgUrl)):
+                imgUrl[index]=imgUrl[index].replace('"sample_url":','').replace(',"s','')
+            print('获取日榜图片URL成功')
+            return imgUrl
+        self.Himg=getRecentYandeImgUrl(self)
 
         # 保留此接口作为每日早安任务
         @scheduler.scheduled_job('cron', hour='8', minute='30')
@@ -130,7 +123,8 @@ class Test:
                 new_msg = "今天是" + str(month) + "月" + str(date) + "号周" + str(weekcn) + "呀！ 快起床搬砖！ 嘻嘻，骗你的呀，今天调休呢"
 
             await self.api.send_group_msg(group_id=690925851, message=new_msg)
-
+        async def get_Himg():
+            self.Himg=getRecentYandeImgUrl(self)
 
         # 保留此接口作为每日晚安任务
         @scheduler.scheduled_job('cron', hour='11', minute='30')
@@ -162,22 +156,18 @@ class Test:
 
         # 如果需要使用，请注释掉下面一行
         # return
-
+        
         cmd = ctx['raw_message']
 
+        if cmd.find('苟利国家生死以') != -1:
+            return "岂因祸福避趋之"
         # if cmd.find('你妈死了') != -1 or cmd.find('nmsl') != -1:
         #     reply=requests.get("https://nmsl.shadiao.app/api.php?level=min").text
         #     reply=ab.str2abs(reply)
         #     return reply
 
-        if cmd.find('妈') != -1 and cmd.find('你妈死了') == -1:
-            reply=requests.get("https://v1.hitokoto.cn/?c=i").json()
-
-            # 调用api发送消息，详见cqhttp文档
-            # await self.api.send_private_msg(
-            #     user_id=740984027, message='收到问好')
-
-            # 返回字符串：发送消息并阻止后续插件
+        if cmd.find('妈') != -1:
+            reply=requests.get("https://v1.hitokoto.cn/c=a").json()
             return reply['hitokoto']
         
         if cmd.find('色图') != -1 :
@@ -190,14 +180,19 @@ class Test:
                 print(e)
                 reply = '获取图片失败'
             return reply
-        
+
+        # 图灵机器人API消息回复
         if cmd.find('1453766088') != -1 and cmd.find('CQ:at') != -1:
-            
             msg = re.sub(r'^\[[a-zA-Z,:=\w]*\]','',cmd)
+            payload["perception"]["inputText"]["text"]=msg 
+            payload["userInfo"]["apiKey"] = apiKey[random.randint(0,4)] 
             # apiUrl='http://api.qingyunke.com/api.php?key=free&appid=0&msg='+msg
             reply = requests.post(url,json=payload,headers=headers).json()['results'][0]['values']['text']
             return reply
-          
         
+        if cmd.find('涩图') != -1:
+            index = random.randint(0,39)
+            reply = self.Himg[index]
+            return reply
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
