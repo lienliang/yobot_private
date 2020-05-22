@@ -167,7 +167,7 @@ class Test:
         #     return reply
 
         if cmd.find('妈') != -1:
-            reply=requests.get("https://v1.hitokoto.cn/c=a").json()
+            reply=requests.get("https://v1.hitokoto.cn?c=a").json()
             return reply['hitokoto']
         
         if cmd.find('色图') != -1 :
