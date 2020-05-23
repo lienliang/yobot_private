@@ -194,5 +194,6 @@ class Test:
             index = random.randint(0,39)
             reply = self.Himg[index]
             return reply
+            
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
