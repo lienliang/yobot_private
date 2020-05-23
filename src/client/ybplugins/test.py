@@ -127,7 +127,7 @@ class Test:
             self.Himg=getRecentYandeImgUrl(self)
 
         # 保留此接口作为每日晚安任务
-        @scheduler.scheduled_job('cron', hour='11', minute='30')
+        @scheduler.scheduled_job('cron', hour='23', minute='55')
         async def good_night():
             now = time.time()
             local_time = time.localtime(now)
