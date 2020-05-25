@@ -17,6 +17,7 @@ src/client/*.ics
 src/client/*.pid
 src/client/*.spec
 src/client/test.py
+test.py
 .env
 cqhttp
 .idea/
