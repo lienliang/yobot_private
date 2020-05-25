@@ -1500,7 +1500,7 @@ class ClanBattle:
                     )
                 action = payload['action']
                 if user_id == 0:
-                    # 允许游客查看
+                    #允许游客查看
                     if action not in ['get_member_list', 'get_challenge']:
                         return jsonify(
                             code=10,
