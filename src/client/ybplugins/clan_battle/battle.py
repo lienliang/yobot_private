@@ -1446,6 +1446,28 @@ class ClanBattle:
                 'clan/subscribers.html',
             )
 
+        # scar额外添加的api
+        @app.route(
+            urljoin(self.setting['public_basepath'],
+                    'clan/<int:group_id>/getdata/'),
+            methods=['GET'])
+        async def get_record_api(group_id):
+            group = Clan_group.get_or_none(group_id=group_id)
+            d, _ = pcr_datetime(group.game_server)
+            # 获取出刀记录 其中1590379200为时间戳，需要动态获取
+            report = self.get_report(
+                group_id,
+                None,
+                None,
+                pcr_datetime(group.game_server, 1590379200)[0],
+            )
+            return jsonify(
+                code=30,
+                members=self.get_member_list(group_id),
+                challenge=report,
+                today=d
+            )
+
         @app.route(
             urljoin(self.setting['public_basepath'],
                     'clan/<int:group_id>/api/'),
@@ -1462,6 +1484,7 @@ class ClanBattle:
                     return jsonify(
                         code=10,
                         message='Not logged in',
+                        test="111"
                     )
                 user_id = 0
             else:
@@ -1488,7 +1511,7 @@ class ClanBattle:
                     )
                 action = payload['action']
                 if user_id == 0:
-                    # 允许游客查看
+                    允许游客查看
                     if action not in ['get_member_list', 'get_challenge']:
                         return jsonify(
                             code=10,
