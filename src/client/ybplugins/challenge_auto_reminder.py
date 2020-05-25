@@ -20,6 +20,7 @@ from typing import Any, Dict, Union
 from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
+import requests
 
 
 class Custom:
@@ -43,14 +44,14 @@ class Custom:
         # 此时没有running_loop，不要直接使用await，请使用asyncio.ensure_future并指定loop=asyncio.get_event_loop()
 
         # 如果需要启用，请注释掉下面一行
-        return
+        # return
 
         # 这是来自yobot_config.json的设置，如果需要增加设置项，请修改default_config.json文件
         self.setting = glo_setting
 
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
-
+        
         # # 注册定时任务，详见apscheduler文档
         # @scheduler.scheduled_job('cron', hour=8)
         # async def good_morning():
@@ -70,14 +71,14 @@ class Custom:
         # 注意：这是一个异步函数，禁止使用阻塞操作（比如requests）
 
         # 如果需要使用，请注释掉下面一行
-        return
+        # return
 
         cmd = ctx['raw_message']
         if cmd == '你好':
 
             # 调用api发送消息，详见cqhttp文档
-            await self.api.send_private_msg(
-                user_id=123456, message='收到问好')
+            # await self.api.send_private_msg(
+            #     user_id=123456, message='收到问好')
 
             # 返回字符串：发送消息并阻止后续插件
             return '世界'

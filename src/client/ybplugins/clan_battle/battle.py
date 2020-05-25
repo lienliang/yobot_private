@@ -20,6 +20,7 @@ from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
 from .exception import GroupError, InputError, UserError
 from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
+from .battle_route_def import record_api_helper
 
 _logger = logging.getLogger(__name__)
 
@@ -996,7 +997,9 @@ class ClanBattle:
             start_time: start time of report
             end_time: end time of report
         """
+        print(group_id)
         group = Clan_group.get_or_none(group_id=group_id)
+        print(group)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
         report = []
@@ -1452,21 +1455,7 @@ class ClanBattle:
                     'clan/<int:group_id>/getdata/'),
             methods=['GET'])
         async def get_record_api(group_id):
-            group = Clan_group.get_or_none(group_id=group_id)
-            d, _ = pcr_datetime(group.game_server)
-            # 获取出刀记录 其中1590379200为时间戳，需要动态获取
-            report = self.get_report(
-                group_id,
-                None,
-                None,
-                pcr_datetime(group.game_server, 1590379200)[0],
-            )
-            return jsonify(
-                code=30,
-                members=self.get_member_list(group_id),
-                challenge=report,
-                today=d
-            )
+            return record_api_helper(self=self,group_id=group_id)  # return使用额外definition
 
         @app.route(
             urljoin(self.setting['public_basepath'],
