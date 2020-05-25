@@ -26,7 +26,6 @@ def record_api_helper(
         self,
         group_id
 ):
-<<<<<<< HEAD
     print(group_id)
     group = Clan_group.get_or_none(group_id=group_id)
     print(group.game_server)
@@ -42,24 +41,9 @@ def record_api_helper(
         None,
         None,
         pcr_datetime(group.game_server,stamp)[0],
-=======
-    group = Clan_group.get_or_none(group_id=group_id)
-    d, _ = pcr_datetime(group.game_server)
-    # 获取出刀记录 其中1590379200为时间戳，需要动态获取
-    report = self.get_report(
-        group_id,
-        None,
-        None,
-        pcr_datetime(group.game_server, 1590379200)[0],
->>>>>>> d658b4c0247c13dea10d46e39d838d09902c01ea
     )
     return jsonify(
         code=30,
         members=self.get_member_list(group_id),
-<<<<<<< HEAD
         challenge=report
-=======
-        challenge=report,
-        today=d
->>>>>>> d658b4c0247c13dea10d46e39d838d09902c01ea
     )
