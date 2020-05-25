@@ -138,7 +138,7 @@ class Test:
             week = response["week2"] # extract 信息
 
             if week == "5" or week == "6":
-                new_msg = "今天是周末？ 好吧那... 是可以晚一点，但是不要太晚哦！"
+                new_msg = "今天是周末？ 好吧那... 是可以晚一点睡啦，但是不要太晚哦！"
             else:
                 new_msg = "时间不早了，主人请早点休息，这样才能精神饱满地迎接新的一天呢~"
             await self.api.send_group_msg(group_id=690925851, message=new_msg)
