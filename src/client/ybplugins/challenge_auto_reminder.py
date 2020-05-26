@@ -15,6 +15,7 @@ https://github.com/richardchien/nonebot
 '''
 
 import asyncio
+import time
 from typing import Any, Dict, Union
 
 from aiocqhttp.api import Api
@@ -22,8 +23,54 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
 import requests
 
+from ybplugins import ybdata
+from ybplugins import clan_battle
 
-class Custom:
+
+class auto_reminder:
+
+    # 获取出刀记录
+    def get_challenge_record(self,group_id):
+        d, _ = clan_battle.pcr_datetime('cn')
+        # 获取时间戳
+        now = time.localtime(time.time())
+        time_str = str(now.tm_year) + ',' + str(now.tm_mon) + ',' + str(now.tm_mday) + ',' + str(12)
+        sp = time.strptime(time_str, "%Y,%m,%d,%H")
+        stamp = int(time.mktime(sp))
+        # 获取当天的出刀记录
+        challenge = clan_battle.ClanBattle.get_report(
+            None,
+            group_id,
+            None,
+            None,
+            clan_battle.pcr_datetime('cn', stamp)[0],
+        )
+
+        return challenge
+
+    # 获取成员列表
+    def get_member_list(self, group_id):
+        return clan_battle.ClanBattle.get_member_list(None, group_id)
+
+    # 获取未出够3刀的成员qqid
+    def get_non_record_qqid(self, group_id):
+        member_list = self.get_member_list(group_id)
+        challenge_list = self.get_challenge_record(group_id)
+        challenge = {}
+        for item in member_list:
+            challenge[item['qqid']] = 0
+
+        for item in challenge_list:
+            if not item['is_continue']:
+                challenge[item['qqid']] += 1
+
+        non_record_qqid_list = []
+        for key in challenge:
+            if challenge[key] < 3:
+                non_record_qqid_list.append(key)
+
+        return non_record_qqid_list
+
     def __init__(self,
                  glo_setting: Dict[str, Any],
                  scheduler: AsyncIOScheduler,
@@ -51,16 +98,18 @@ class Custom:
 
         # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
-        
-        # # 注册定时任务，详见apscheduler文档
-        # @scheduler.scheduled_job('cron', hour=8)
-        # async def good_morning():
-        #     await self.api.send_group_msg(group_id=123456, message='早上好')
 
-        # # 注册web路由，详见flask与quart文档
-        # @app.route('/is-bot-running', methods=['GET'])
-        # async def check_bot():
-        #     return 'yes, bot is running'
+        # 催刀模式
+        @scheduler.scheduled_job('cron', hour={0,1,21,23}, minute='25') # 更加人性化的设定，仅在当天九点后每隔一到两小时提醒一次出刀
+        async def reminder():
+            # 参数为群号
+            qqid = self.get_non_record_qqid(690925851)
+            print(qqid)
+            msg = "可可萝提醒您，主人您今天还没出够3刀 0x0"
+            for item in qqid:
+                await self.api.send_private_msg(user_id=item, message=msg)
+
+
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
@@ -71,8 +120,8 @@ class Custom:
         # 注意：这是一个异步函数，禁止使用阻塞操作（比如requests）
 
         # 如果需要使用，请注释掉下面一行
-        # return
-
+        return
+        '''
         cmd = ctx['raw_message']
         if cmd == '你好':
 
@@ -84,4 +133,4 @@ class Custom:
             return '世界'
 
         # 返回布尔值：是否阻止后续插件（返回None视作False）
-        return False
+        return False '''
