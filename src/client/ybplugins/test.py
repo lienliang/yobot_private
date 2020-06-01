@@ -29,6 +29,8 @@ import re
 import ab
 import json
 
+from ybplugins import ybdata
+from ybplugins import clan_battle
 
 
 # 图灵机器人API
@@ -100,7 +102,7 @@ class Test:
                 imgUrl[index]=imgUrl[index].replace('"sample_url":','').replace(',"s','')
             print('获取日榜图片URL成功')
             return imgUrl
-        self.Himg=getRecentYandeImgUrl(self)
+        # self.Himg=getRecentYandeImgUrl(self)
         
         
         # 保留此接口作为每日早安任务
@@ -147,9 +149,7 @@ class Test:
             else:
                 new_msg = "时间不早了，主人请早点休息，这样才能精神饱满地迎接新的一天呢~"
             await self.api.send_group_msg(group_id=690925851, message=new_msg)
-
-
-                
+            
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
         每次bot接收有效消息时触发
