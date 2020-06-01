@@ -102,7 +102,7 @@ class Test:
                 imgUrl[index]=imgUrl[index].replace('"sample_url":','').replace(',"s','')
             print('获取日榜图片URL成功')
             return imgUrl
-        # self.Himg=getRecentYandeImgUrl(self)
+        self.Himg=getRecentYandeImgUrl(self)
         
         
         # 保留此接口作为每日早安任务
@@ -199,9 +199,5 @@ class Test:
             reply = self.Himg[index]
             return reply
         
-        if cmd == 'test':
-            record=get_challenge_record(624759923)
-            print(record)
-            return 'test'
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False

@@ -34,9 +34,13 @@ class auto_reminder:
         d, _ = clan_battle.pcr_datetime('cn')
         # 获取时间戳
         now = time.localtime(time.time())
-        time_str = str(now.tm_year) + ',' + str(now.tm_mon) + ',' + str(now.tm_mday) + ',' + str(12)
+        day=now.tm_mday
+        if now.tm_hour<5:
+            day=now.tm_mday-1
+        time_str = str(now.tm_year) + ',' + str(now.tm_mon) + ',' + str(day) + ',' + str(12)
         sp = time.strptime(time_str, "%Y,%m,%d,%H")
         stamp = int(time.mktime(sp))
+        print(stamp)
         # 获取当天的出刀记录
         challenge = clan_battle.ClanBattle.get_report(
             None,
@@ -120,7 +124,7 @@ class auto_reminder:
         # 注意：这是一个异步函数，禁止使用阻塞操作（比如requests）
 
         # 如果需要使用，请注释掉下面一行
-        return
+        # return
         '''
         cmd = ctx['raw_message']
         if cmd == '你好':
@@ -134,3 +138,9 @@ class auto_reminder:
 
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False '''
+        cmd = ctx['raw_message']
+        if cmd == 'test':
+            record=self.get_challenge_record(690925851)
+            # qqid = self.get_non_record_qqid(690925851)
+            print(record)
+            return 'test'

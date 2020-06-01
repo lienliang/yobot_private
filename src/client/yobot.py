@@ -221,8 +221,8 @@ class Yobot:
         # load new plugins
         self.plug_new = [
             custom.Custom(**kwargs),
-            test.Test(**kwargs)
-            # challenge_auto_reminder.auto_reminder(**kwargs)
+            test.Test(**kwargs),
+            challenge_auto_reminder.auto_reminder(**kwargs)
         ]
 
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
