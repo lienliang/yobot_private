@@ -298,7 +298,6 @@ var vm = new Vue({
     },
     getHimg() {
       this.$message.success("fuc1k131");
-
       var instance = axios.create({
         baseURL: "https://api.ixiaowai.cn",
       });
