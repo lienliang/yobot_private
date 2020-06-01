@@ -100,7 +100,7 @@ class auto_reminder:
         self.api = bot_api
 
         # 催刀模式
-        @scheduler.scheduled_job('cron', hour={0,1,21,23}, minute='25') # 更加人性化的设定，仅在当天九点后每隔一到两小时提醒一次出刀
+        @scheduler.scheduled_job('cron', hour='0,1,21,23', minute='25') # 更加人性化的设定，仅在当天九点后每隔一到两小时提醒一次出刀
         async def reminder():
             # 参数为群号
             qqid = self.get_non_record_qqid(690925851)
