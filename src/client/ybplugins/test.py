@@ -65,7 +65,12 @@ def get_challenge_record(group_id):
     d, _ = clan_battle.pcr_datetime('cn')
     # 获取时间戳
     now =time.localtime(time.time())
-    time_str=str(now.tm_year)+','+str(now.tm_mon)+','+str(now.tm_mday)+','+str(12)
+    if now.tm_hour<5:
+        day=now.tm_mday-1
+    else:
+        day=now.tm_mday
+    
+    time_str=str(now.tm_year)+','+str(now.tm_mon)+','+str(day)+','+str(12)
     sp=time.strptime(time_str,"%Y,%m,%d,%H")
     stamp=int(time.mktime(sp))
     # 获取当天的出刀记录
@@ -249,6 +254,10 @@ class Test:
             index = random.randint(0,39)
             reply = self.Himg[index]
             return reply
-
+        
+        if cmd == 'test':
+            record=get_challenge_record(624759923)
+            print(record)
+            return 'test'
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False
