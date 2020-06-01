@@ -29,8 +29,6 @@ import re
 import ab
 import json
 
-from ybplugins import ybdata
-from ybplugins import clan_battle
 
 
 # 图灵机器人API
@@ -60,52 +58,6 @@ apiKey = [
     "b13414ff212840759e08455398326e41",
 ]
 
-# 获取出刀记录
-def get_challenge_record(group_id):
-    d, _ = clan_battle.pcr_datetime('cn')
-    # 获取时间戳
-    now =time.localtime(time.time())
-    if now.tm_hour<5:
-        day=now.tm_mday-1
-    else:
-        day=now.tm_mday
-    
-    time_str=str(now.tm_year)+','+str(now.tm_mon)+','+str(day)+','+str(12)
-    sp=time.strptime(time_str,"%Y,%m,%d,%H")
-    stamp=int(time.mktime(sp))
-    # 获取当天的出刀记录
-    challenge = clan_battle.ClanBattle.get_report(
-        None,
-        group_id,
-        None,
-        None,
-        clan_battle.pcr_datetime('cn',stamp)[0],
-    )
-    
-    return challenge
-
-# 获取成员列表
-def get_member_list(group_id):
-    return clan_battle.ClanBattle.get_member_list(None,group_id)
-
-# 获取未出够3刀的成员qqid
-def get_non_record_qqid(group_id):
-    member_list = get_member_list(group_id)
-    challenge_list = get_challenge_record(group_id)
-    challenge={}
-    for item in member_list:
-        challenge[item['qqid']] = 0
-
-    for item in challenge_list:
-        if not item['is_continue']:
-            challenge[item['qqid']] = challenge[item['qqid']]+1
-    
-    non_record_qqid_list=[]
-    for key in challenge:
-        if challenge[key] < 3:
-            non_record_qqid_list.append(key)
-
-    return non_record_qqid_list  
 
 class Test:
     Himg:[]
@@ -196,15 +148,7 @@ class Test:
                 new_msg = "时间不早了，主人请早点休息，这样才能精神饱满地迎接新的一天呢~"
             await self.api.send_group_msg(group_id=690925851, message=new_msg)
 
-        # 催刀模式
-        @scheduler.scheduled_job('interval',minutes=120)
-        async def reminder():
-            # 参数为群号
-            qqid=get_non_record_qqid(690925851)
-            print(qqid)
-            msg = "可可萝提醒您，主人您今天还没出够3刀 0x0"
-            for item in qqid:
-                await self.api.send_private_msg(user_id=item, message = msg)
+
                 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
