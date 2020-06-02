@@ -199,5 +199,10 @@ class Test:
             reply = self.Himg[index]
             return reply
         
+        if cmd.find('谢谢茄子') != -1:
+            picnum=random.randint(1,2638)
+            url = 'http://106.52.133.22:8070/'+str(picnum)+'.jpg'
+            return url
+
         # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False

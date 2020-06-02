@@ -7,6 +7,8 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
   <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
   <style>
     body{
       text-align:center;
@@ -37,7 +39,13 @@
       <el-menu-item index="5">我的</el-menu-item>
     </el-menu>
     <el-container style="margin-top: 50px">
+      
       <el-header class="big">Boss状态</el-header>
+      <el-alert
+        v-show="+bossData.health<1500000?true:false"
+        title="boss血量低于150W，请不要轻易出刀"
+        type="warning" center show-icon>
+      </el-alert>
       <el-main>
         <el-row>
           <el-col :span="12"><a class="exbig">[[ bossData.cycle ]]</a><a class="big">周目</a></el-col>
@@ -184,6 +192,7 @@
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
           <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">设置</el-button></a></el-col>
           <el-col :span="6"><el-button type="warning" size="small" @click="getHimg">不色的图</el-button></el-col>
+          <el-col :span="6"><el-button type="danger" size="small" @click="getRealHimg">我TM射爆</el-button></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">
             <el-alert title="如果要清空数据，请在“设置”中操作，否则会导致分析数据不准确"
               type="warning" :hidden="(bossData.cycle!=1)||(bossData.num!=1)"></el-alert>
@@ -518,6 +527,15 @@ var vm = new Vue({
     getHimg() {
       // this.$message.success("fuc1k131");
       window.open('https://api.ixiaowai.cn/api/api.php','_blank')
+    },
+    random(min,max){
+      return Math.floor(Math.random() * (max - min)) + min;
+    },
+    getRealHimg(){
+      var num = this.random(1,2638)
+      var hImgUrl=`http://106.52.133.22:8070/${num}.jpg`
+      console.log(hImgUrl)
+      window.open(hImgUrl,'_blank')
     },
     get_data() {
       var thisvue = this;
