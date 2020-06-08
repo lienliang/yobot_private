@@ -110,8 +110,8 @@ class auto_reminder:
             qqid = self.get_non_record_qqid(690925851)
             print(qqid)
             msg = "可可萝提醒您，主人您今天还没出够3刀 0x0"
-            for item in qqid:
-                await self.api.send_private_msg(user_id=item, message=msg)
+            # for item in qqid:
+                # await self.api.send_private_msg(user_id=item, message=msg)
 
 
 
