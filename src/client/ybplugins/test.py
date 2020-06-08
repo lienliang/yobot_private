@@ -102,7 +102,7 @@ class Test:
                 imgUrl[index]=imgUrl[index].replace('"sample_url":','').replace(',"s','')
             print('获取日榜图片URL成功')
             return imgUrl
-        # self.Himg=getRecentYandeImgUrl(self)
+        self.Himg=getRecentYandeImgUrl(self)
         
         
         # 保留此接口作为每日早安任务
