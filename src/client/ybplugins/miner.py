@@ -100,23 +100,25 @@ class mining_query:
         for i in cmd_raw:
             if i.isdigit():
                 value.append(i)
-            else:
+            elif (i != ' '):
                 cmd.append(i)
-
-        if not value:
-            new_msg = f'请输入"挖矿 纯数字最高排名"'
-            await self.api.send_group_msg(group_id=690925851, message=new_msg)
-            return
 
         words_list = ['挖矿', 'jjc钻石', '竞技场钻石', 'jjc钻石查询', '竞技场钻石查询']
         words_set = set(words_list)
 
-        strings = [str(integer) for integer in value]
-        value = "".join(strings)
-        cmd_txt = ""
-        cmd_txt.join(cmd)
+        cmd_txt = ''.join(cmd)
+        print(cmd_txt)
 
         if cmd_txt in words_set:
+
+            if not value:
+                new_msg = f'请输入"挖矿 纯数字最高排名"'
+                await self.api.send_group_msg(group_id=690925851, message=new_msg)
+                return
+
+            value_tmp = [str(integer) for integer in value]
+            value = ''.join(value_tmp)
+
             rank = int(value)
             rank = np.clip(rank, 1, 15001)
 
