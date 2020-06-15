@@ -126,7 +126,7 @@ class mining_query:
             s_this = int(this_season[1:rank].sum())
 
             # 调用api发送消息，详见cqhttp文档
-            new_msg = f"\n最高排名奖励还剩 {s_this} 钻\n历届最高排名还剩 {s_all} 钻"
+            new_msg = f"最高排名奖励还剩 {s_this} 钻\n历届最高排名还剩 {s_all} 钻"
             await self.api.send_group_msg(group_id=690925851, message=new_msg)
 
             # 返回字符串：发送消息并阻止后续插件
